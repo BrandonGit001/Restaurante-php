@@ -1,0 +1,164 @@
+/* admin/css/admin.css */
+:root {
+    --primary: #2c3e50; /* Azul oscuro elegante */
+    --accent: #27ae60;  /* Verde éxito */
+    --bg: #f5f6fa;      /* Gris muy claro para el fondo */
+    --white: #ffffff;
+    --text: #2f3640;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+/* Estructura Principal: Sidebar a la izquierda, Contenido a la derecha */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* === SIDEBAR (Menú Lateral) === */
+.sidebar {
+    width: 250px;
+    background-color: var(--primary);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 22px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 20px;
+}
+
+.sidebar a {
+    color: #bdc3c7;
+    text-decoration: none;
+    padding: 15px 25px;
+    transition: 0.3s;
+    font-size: 16px;
+}
+
+.sidebar a:hover, .sidebar a.active {
+    background-color: rgba(255,255,255,0.1);
+    color: var(--white);
+    border-left: 4px solid var(--accent);
+}
+
+.sidebar a.salir {
+    margin-top: auto; /* Empuja el botón al fondo */
+    background-color: #c0392b;
+    color: white;
+}
+
+/* === CONTENIDO PRINCIPAL === */
+.main-content {
+    flex: 1;
+    padding: 30px;
+}
+
+.header-admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+/* Tarjetas de Estadísticas (Dashboard) */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background: var(--white);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.stat-card h3 {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.stat-card .numero {
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--primary);
+    margin: 10px 0;
+}
+
+/* --- AGREGAR AL FINAL DE admin/css/admin.css --- */
+
+/* Estilos para Tablas de Datos */
+.tabla-datos {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-top: 20px;
+}
+
+.tabla-datos th, .tabla-datos td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.tabla-datos th {
+    background-color: var(--primary);
+    color: white;
+    font-weight: 500;
+}
+
+.tabla-datos tr:hover {
+    background-color: #f9f9f9;
+}
+
+.img-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* Botones de Acción (Editar/Borrar) */
+.btn {
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-main { background-color: var(--primary); color: white; }
+.btn-verde { background-color: var(--accent); color: white; }
+.btn-rojo  { background-color: #e74c3c; color: white; }
+.btn-azul  { background-color: #3498db; color: white; }
+
+/* Badges (Etiquetas de estado) */
+.badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.badge-verde { background: #d4edda; color: #155724; }
+.badge-rojo { background: #f8d7da; color: #721c24; }

@@ -1,0 +1,271 @@
+/* archivo: assets/css/style.css */
+:root {
+    --primary: #ff6b6b; /* Un rojo coral apetitoso */
+    --secondary: #2c3e50; /* Azul oscuro elegante */
+    --accent: #1dd1a1; /* Verde menta para "Abierto" */
+    --bg: #f7f1e3; /* Crema suave de fondo */
+    --text: #2d3436;
+    --card-bg: #ffffff;
+    --shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Poppins', sans-serif; /* Si puedes, importa esta fuente en el HTML */
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+/* === HEADER & NAV === */
+header {
+    background: var(--card-bg);
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo { font-size: 24px; font-weight: 800; color: var(--secondary); text-transform: uppercase; }
+.logo span { color: var(--primary); }
+
+.status-badge {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.status-open { background: #d1f2eb; color: #16a085; border: 1px solid #16a085; }
+.status-closed { background: #fadbd8; color: #c0392b; border: 1px solid #c0392b; }
+
+.btn-whatsapp {
+    background-color: #25D366;
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: bold;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-whatsapp:hover { background-color: #128C7E; transform: translateY(-2px); }
+
+/* === HERO SECTION (Platillo del día) === */
+.hero {
+    padding: 60px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.hero-text { flex: 1; min-width: 300px; padding-right: 20px; }
+.hero-text h1 { font-size: 3rem; line-height: 1.2; color: var(--secondary); margin-bottom: 20px; }
+.hero-text p { font-size: 1.2rem; color: #636e72; margin-bottom: 30px; }
+.hero-img { flex: 1; min-width: 300px; text-align: center; }
+.hero-img img { width: 100%; max-width: 500px; border-radius: 20px; box-shadow: var(--shadow); transform: rotate(-3deg); transition: 0.5s; }
+.hero-img img:hover { transform: rotate(0deg) scale(1.02); }
+
+/* === MENU GRID === */
+.menu-section { padding: 40px 5%; max-width: 1200px; margin: 0 auto; }
+.category-title { font-size: 2rem; margin-bottom: 20px; color: var(--secondary); border-left: 5px solid var(--primary); padding-left: 15px; }
+
+/* --- CORRECCIONES DEL GRID Y CARDS --- */
+
+/* 1. El Contenedor de la Rejilla */
+.products-grid {
+    display: grid;
+    /* Esto crea columnas automáticas de mínimo 280px. Si la pantalla es grande, caben 3 o 4. */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px; /* Espacio entre tarjetas */
+    padding: 20px 0;
+}
+
+/* 2. La Tarjeta (Card) */
+.card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    overflow: hidden; /* Para que la imagen no se salga de las esquinas redondeadas */
+    transition: transform 0.3s ease;
+    display: flex;       
+    flex-direction: column; /* Hace que el contenido se apile verticalmente */
+    height: 100%;        /* OBLIGA a todas las tarjetas a tener la misma altura que la más alta */
+    border: 1px solid #eee;
+    position: relative;
+    
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+}
+
+/* 3. La Imagen (EL TRUCO MÁGICO) 🎩✨ */
+.card-img {
+    width: 100%;
+    height: 200px;       /* Altura FIJA para todas */
+    object-fit: cover;   /* Recorta la imagen para llenar el hueco sin deformarla */
+    display: block;
+}
+
+/* 4. El cuerpo de la tarjeta */
+.card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Esto empuja el footer hacia abajo si hay espacio vacío */
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.card-desc {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 15px;
+    flex-grow: 1; /* Ayuda a alinear */
+}
+
+/* 5. El Footer (Precio y Botón) */
+.card-footer {
+    margin-top: auto; /* IMPORTANTE: Pega esto al fondo de la tarjeta */
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.precio {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.btn-add {
+    background: #25d366; /* Verde WhatsApp */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.btn-add:hover {
+    background: #128c7e;
+}
+.btn-disabled { background: #ccc; cursor: not-allowed; }
+
+/* === FILTROS (Categorias) === */
+.filters { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; margin-bottom: 20px; }
+.filter-btn {
+    background: white; border: 1px solid #ddd; padding: 8px 20px;
+    border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: 500;
+}
+.filter-btn.active, .filter-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* --- COPIA ESTO AL FINAL DE assets/css/style.css --- */
+
+/* Fondo oscuro que cubre toda la pantalla (Oculto por defecto) */
+.modal-overlay {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(0,0,0,0.5); 
+    z-index: 2000;
+    display: none; /* <--- ESTO ES LO IMPORTANTE: Lo oculta */
+    justify-content: center; 
+    align-items: center;
+}
+
+/* Clase para mostrarlo cuando se activa con JS */
+.modal-overlay.activo { 
+    display: flex; 
+}
+
+/* La cajita blanca del carrito */
+.modal-content {
+    background: white; 
+    width: 90%; 
+    max-width: 400px;
+    padding: 20px; 
+    border-radius: 15px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    position: relative; 
+    max-height: 80vh; 
+    overflow-y: auto;
+}
+
+/* Botón de cerrar (X) */
+.close-btn {
+    position: absolute; 
+    top: 15px; 
+    right: 15px;
+    background: #eee; 
+    border: none; 
+    width: 30px; 
+    height: 30px; 
+    border-radius: 50%;
+    cursor: pointer; 
+    font-weight: bold;
+}
+
+/* Cada producto en la lista */
+.item-carrito {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 10px 0; 
+    border-bottom: 1px solid #eee;
+}
+
+/* Fila del total */
+.total-row {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    margin-top: 20px; 
+    font-size: 1.2rem; 
+    font-weight: bold; 
+    color: var(--secondary);
+}
+
+/* Botón verde de pedir */
+.btn-pedir {
+    display: block; 
+    width: 100%; 
+    padding: 15px; 
+    margin-top: 20px;
+    background: #25D366; 
+    color: white; 
+    text-align: center; 
+    text-decoration: none;
+    border-radius: 10px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    border: none; 
+    font-size: 1rem;
+}
+.btn-pedir:hover { 
+    background: #128C7E; 
+}
