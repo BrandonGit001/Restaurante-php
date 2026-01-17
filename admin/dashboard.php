@@ -41,6 +41,7 @@ $pendientes = $stmt->fetchColumn();
         <h2>Mi Restaurante</h2>
         <a href="dashboard.php" class="active">📊 Resumen</a>
         <a href="pedidos.php">🛎️ Pedidos <?php if($pendientes>0) echo "<span class='badge'>$pendientes</span>"; ?></a>
+        <a href="reportes.php">📈 Reportes</a> 
         <a href="productos.php">🍔 Productos</a>
         <a href="categorias.php">📂 Categorías</a>
         <a href="galeria.php">📸 Galería</a>

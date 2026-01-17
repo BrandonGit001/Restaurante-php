@@ -269,3 +269,47 @@ header {
 .btn-pedir:hover { 
     background: #128C7E; 
 }
+
+
+/* BUSCA ESTO EN TU CSS */
+.categorias-scroll { 
+    display: flex; 
+    overflow-x: auto; 
+    gap: 10px; 
+    padding: 20px; 
+    justify-content: center;
+    
+    /* 👇 AGREGA ESTAS 2 LÍNEAS PARA OCULTAR EN FIREFOX/EDGE 👇 */
+    scrollbar-width: none;  
+    -ms-overflow-style: none;
+}
+
+/* 👇 AGREGA ESTO JUSTO DEBAJO PARA OCULTAR EN CHROME/OPERA 👇 */
+.categorias-scroll::-webkit-scrollbar { 
+    display: none; 
+}
+
+/* --- ESTILOS DEL HEADER FIJO (Para todas las páginas) --- */
+.navbar-fija, header {
+    position: fixed;         /* Lo obliga a flotar */
+    top: 0;                  /* Pegado al techo */
+    left: 0; 
+    width: 100%;             /* Ancho completo */
+    background: rgba(255, 255, 255, 0.95); /* Blanco semi-transparente */
+    backdrop-filter: blur(10px);           /* Efecto borroso pro tipo iPhone */
+    z-index: 1000;           /* Siempre encima de todo */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Sombrita sutil */
+    padding: 15px 20px;      /* Espacio interno */
+    box-sizing: border-box;  /* Evita que el padding rompa el ancho */
+    
+    /* Para alinear los elementos adentro */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Ajuste para que el cuerpo no se esconda detrás del header */
+body {
+    padding-top: 90px;      /* Empujamos el contenido hacia abajo */
+    margin: 0;              /* Quitamos márgenes feos del navegador */
+}

@@ -15,20 +15,18 @@ $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt = $pdo->query("SELECT * FROM productos WHERE destacado = 1 AND activo = 1 LIMIT 1");
 $destacado = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// 4. Productos
-$sql = "SELECT p.*, c.nombre as categoria_nombre, 
-        COALESCE(AVG(r.calificacion), 0) as promedio, 
-        COUNT(r.id) as num_resenas
+// 4. Productos 
+$sql = "SELECT p.*, c.nombre as categoria_nombre,
+        0 as promedio, 
+        0 as num_resenas 
         FROM productos p 
         LEFT JOIN categorias c ON p.categoria_id = c.id 
-        LEFT JOIN resenas r ON p.id = r.producto_id
         WHERE p.activo = 1 
-        GROUP BY p.id 
         ORDER BY c.orden ASC, p.id DESC";
 $stmt = $pdo->query($sql);
 $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // 5. Cargar Galería
-$galeria = $pdo->query("SELECT * FROM galeria ORDER BY id DESC LIMIT 8")->fetchAll(PDO::FETCH_ASSOC);
+$galeria = $pdo->query("SELECT * FROM galeria ORDER BY id DESC LIMIT 6")->fetchAll(PDO::FETCH_ASSOC);
 // Variables auxiliares
 $esta_abierto = (bool) $config['estado_tienda'];
 $tiempo_estimado = $config['tiempo_estimado'] ?? '';
@@ -106,16 +104,28 @@ $usuario_nombre = $_SESSION['user_nombre'] ?? 'Invitado';
 <body data-telefono="<?php echo htmlspecialchars($config['telefono_whatsapp']); ?>" 
       data-negocio="<?php echo htmlspecialchars($config['nombre_negocio']); ?>"
       data-modo="<?php echo $config['usar_whatsapp']; ?>">
-
+        <?php if(!$esta_abierto): ?>
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center;">
+            <div style="font-size: 5rem;">😴</div>
+            <h1>¡Lo sentimos, estamos cerrados!</h1>
+            <p>Nuestro horario de atención ha terminado por hoy.</p>
+            <p>Vuelve mañana para probar el mejor sabor.</p>
+            <a href="login.php" style="margin-top: 20px; color: #777; font-size: 0.8rem;">Soy Admin</a>
+        </div>
+    <?php endif; ?>
     <header class="navbar-fija">
         <div class="logo" style="font-weight: 800; font-size: 1.5rem; color: #333;">
             <?php echo htmlspecialchars($config['nombre_negocio']); ?> 🍔
         </div>
         
         <div class="user-menu" style="display:flex; align-items:center; gap:15px;">
+            
             <?php if(isset($_SESSION['user_id'])): ?>
                 <span style="font-weight:600; color:#27ae60;">Hola, <?php echo htmlspecialchars($usuario_nombre); ?></span>
                 <a href="mis_pedidos.php" style="color:#333; text-decoration:none;">Mis Pedidos</a>
+                <a href="menu.php" style="text-decoration: none; color: #333; font-weight: bold; border-bottom: 2px solid #f1c40f;">
+        📜 Menú Completo
+    </a>
                 <a href="logout.php" style="color:red; text-decoration:none;">Salir</a>
             <?php else: ?>
                 <a href="login.php" style="color:#333; text-decoration:none; font-weight:bold;">Entrar</a>
@@ -168,13 +178,7 @@ $usuario_nombre = $_SESSION['user_nombre'] ?? 'Invitado';
                     <div class="card-body">
                         <div class="card-title"><?php echo htmlspecialchars($prod['nombre']); ?></div>
                         
-                        <div style="color: #f1c40f; margin-bottom: 10px;">
-                            <?php 
-                                $prom = round($prod['promedio']);
-                                for($i=1; $i<=5; $i++) echo ($i<=$prom)?'★':'☆';
-                            ?>
-                            <span style="color:#aaa; font-size:0.8rem;">(<?php echo $prod['num_resenas']; ?>)</span>
-                        </div>
+                       
 
                         <div class="card-desc"><?php echo htmlspecialchars(substr($prod['descripcion'], 0, 60)); ?>...</div>
                         
@@ -186,6 +190,24 @@ $usuario_nombre = $_SESSION['user_nombre'] ?? 'Invitado';
                 </div>
             <?php endforeach; ?>
         </div>
+        <div style="text-align: center; margin: 40px 0 60px 0;">
+        <h3 style="color: #555;">¿Te quedaste con hambre de más? 😋</h3>
+        <a href="menu.php" style="
+            background: #2c3e50; 
+            color: white; 
+            padding: 15px 40px; 
+            text-decoration: none; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            border-radius: 50px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            display: inline-block;
+        " onmouseover="this.style.transform='scale(1.05)'" 
+          onmouseout="this.style.transform='scale(1)'">
+            📜 Ver Menú Completo
+        </a>
+    </div>
         <?php if(!empty($galeria)): ?>
 <section style="padding: 50px 0; background: white;">
     <div class="container" style="text-align: center;">

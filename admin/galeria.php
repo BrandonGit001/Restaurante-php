@@ -56,11 +56,12 @@ $fotos = $pdo->query("SELECT * FROM galeria ORDER BY id DESC")->fetchAll();
 <div class="admin-layout">
     <nav class="sidebar">
         <h2>Mi Restaurante</h2>
-          <a href="dashboard.php" class="active">📊 Resumen</a>
-        <<a href="pedidos.php">🛎️ Pedidos</a>
+            <a href="dashboard.php">📊 Resumen</a>
+        <a href="pedidos.php">🛎️ Pedidos</a>
+        <a href="reportes.php">📈 Reportes</a> 
         <a href="productos.php">🍔 Productos</a>
         <a href="categorias.php">📂 Categorías</a>
-        <a href="galeria.php">📸 Galería</a>
+        <a href="galeria.php" class="active">📸 Galería</a>
         <a href="resenas.php">⭐ Reseñas</a>
         <a href="configuracion.php">⚙️ Configuración</a>
         <a href="logout.php" class="salir">Cerrar Sesión</a>

@@ -1,50 +1,43 @@
-/* Archivo: assets/js/app.js (VERSIÓN COMPLETA Y CORREGIDA) */
+/* Archivo: assets/js/app.js (VERSIÓN FINAL CORREGIDA) */
 
-// 1. LEER CONFIGURACIÓN DESDE EL HTML
-// Usamos "OR 1" para que por defecto sea WhatsApp si falla la lectura
+// 1. LEER CONFIGURACIÓN
 const modoWhatsapp = (document.body.dataset.modo === "0") ? false : true;
 const numeroWhatsApp = document.body.dataset.telefono || "0000000000";
 const nombreNegocio = document.body.dataset.negocio || "Restaurante";
 const tiempoEstimado = document.body.dataset.tiempo || "30-45 min";
+// Leemos el cliente desde el HTML (que PHP ya pintó ahí)
+const clienteLogueado = document.body.dataset.cliente || "Cliente Web";
 
 let carrito = [];
 
-// 2. INICIAR (Al cargar la página)
+// 2. INICIAR
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Sistema cargado. Modo WhatsApp:", modoWhatsapp);
-    
-    // Recuperar carrito si existe
     if(localStorage.getItem('mi_carrito_v1')) {
         carrito = JSON.parse(localStorage.getItem('mi_carrito_v1'));
         actualizarContador();
     }
 });
 
-// 3. FUNCIÓN: AGREGAR AL CARRITO
+// 3. AGREGAR
 function agregarAlCarrito(id, nombre, precio) {
-    // Buscar si ya existe
     const existente = carrito.find(item => item.id === id);
-    
     if(existente) {
         existente.cantidad++;
     } else {
         carrito.push({ id, nombre, precio, cantidad: 1 });
     }
-
     guardarYActualizar();
-    
-    // Feedback visual (puedes cambiarlo por un toast más bonito luego)
     alert(`Se agregó: ${nombre} 🍔`);
 }
 
-// 4. GUARDAR Y ACTUALIZAR VISTA
+// 4. GUARDAR
 function guardarYActualizar() {
     localStorage.setItem('mi_carrito_v1', JSON.stringify(carrito));
     actualizarContador();
     renderizarModal();
 }
 
-// 5. ACTUALIZAR CONTADOR ROJO
+// 5. CONTADOR
 function actualizarContador() {
     const contador = document.getElementById('carrito-count');
     if(contador) {
@@ -53,19 +46,16 @@ function actualizarContador() {
     }
 }
 
-// 6. ABRIR/CERRAR MODAL
+// 6. TOGGLE MODAL
 function toggleCarrito() {
     const modal = document.getElementById('modal-carrito');
     if(modal) {
         modal.classList.toggle('activo');
-        // Si abrimos el carrito, renderizamos de nuevo por si acaso
-        if(modal.classList.contains('activo')) {
-            renderizarModal();
-        }
+        if(modal.classList.contains('activo')) renderizarModal();
     }
 }
 
-// 7. DIBUJAR ITEMS EN EL MODAL
+// 7. RENDERIZAR
 function renderizarModal() {
     const contenedor = document.getElementById('carrito-items');
     const totalElemento = document.getElementById('carrito-total');
@@ -83,7 +73,6 @@ function renderizarModal() {
     carrito.forEach((item, index) => {
         const subtotal = item.precio * item.cantidad;
         totalPrecio += subtotal;
-
         contenedor.innerHTML += `
             <div class="item-carrito">
                 <div>
@@ -94,54 +83,44 @@ function renderizarModal() {
                     <span>$${subtotal.toFixed(2)}</span>
                     <button onclick="eliminarItem(${index})" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold; margin-left:10px;">X</button>
                 </div>
-            </div>
-        `;
+            </div>`;
     });
 
     totalElemento.innerText = `$${totalPrecio.toFixed(2)}`;
-    
-    // Mostrar tiempo estimado si existe el div
-    if(avisoTiempo) {
-        avisoTiempo.innerHTML = `⏱️ Tiempo estimado: <strong>${tiempoEstimado}</strong>`;
-    }
+    if(avisoTiempo) avisoTiempo.innerHTML = `⏱️ Tiempo estimado: <strong>${tiempoEstimado}</strong>`;
 }
 
-// 8. ELIMINAR ITEM
+// 8. ELIMINAR
 function eliminarItem(index) {
     carrito.splice(index, 1);
     guardarYActualizar();
 }
 
-// 9. ENVIAR PEDIDO (Lógica Híbrida)
+// 9. ENVIAR PEDIDO (LÓGICA CORREGIDA)
 function enviarPedido() {
     if(carrito.length === 0) return alert('Agrega productos antes de pedir.');
+
+    // Calculamos el total aquí
+    let totalCalculado = 0;
+    carrito.forEach(item => totalCalculado += (item.precio * item.cantidad));
 
     // --- OPCIÓN A: WHATSAPP ---
     if (modoWhatsapp) {
         let mensaje = `Hola *${nombreNegocio}*, quiero hacer un pedido: \n\n`;
-        let total = 0;
-
         carrito.forEach(item => {
-            const subtotal = item.precio * item.cantidad;
-            total += subtotal;
-            mensaje += `▪️ ${item.cantidad}x ${item.nombre} - $${subtotal} \n`;
+            mensaje += `▪️ ${item.cantidad}x ${item.nombre} - $${item.precio * item.cantidad} \n`;
         });
-
-        mensaje += `\n*TOTAL A PAGAR: $${total}*`;
-        mensaje += `\n\nQuedo en espera de confirmación.`;
-
-        const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
-        window.open(url, '_blank');
+        mensaje += `\n*TOTAL A PAGAR: $${totalCalculado}*`;
+        
+        window.open(`https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`, '_blank');
     
     } else {
         // --- OPCIÓN B: BASE DE DATOS LOCAL ---
         if(!confirm("¿Confirmar pedido y enviar a cocina?")) return;
 
-     const nombreReal = document.body.dataset.cliente || "Cliente Web";
-
         const datosPedido = {
-            cliente: nombreReal, // <--- AQUÍ ESTÁ EL CAMBIO
-            total: total,
+            cliente: clienteLogueado, 
+            total: totalCalculado,  // <--- ¡Ahora sí lleva el total!
             productos: carrito
         };
 
@@ -157,6 +136,8 @@ function enviarPedido() {
                 carrito = [];
                 guardarYActualizar();
                 toggleCarrito();
+                // REDIRECCIONAR A MIS PEDIDOS PARA QUE EL USUARIO LO VEA
+                window.location.href = "mis_pedidos.php"; 
             } else {
                 alert("❌ Error: " + data.message);
             }

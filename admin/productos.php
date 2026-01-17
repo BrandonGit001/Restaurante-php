@@ -51,11 +51,10 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
 <nav class="sidebar">
         <h2>Mi Restaurante</h2>
-        <a href="dashboard.php" class="active">📊 Resumen</a>
-        
+        <a href="dashboard.php" >📊 Resumen</a>
         <a href="pedidos.php">🛎️ Pedidos</a>
-        
-        <a href="productos.php">🍔 Productos</a>
+         <a href="reportes.php">📈 Reportes</a> 
+        <a href="productos.php" class="active">🍔 Productos</a>
         <a href="categorias.php">📂 Categorías</a>
         <a href="galeria.php">📸 Galería</a>
         <a href="resenas.php">⭐ Reseñas</a>

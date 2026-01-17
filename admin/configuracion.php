@@ -62,10 +62,12 @@ $config = $stmt->fetch();
         <h2>Mi Restaurante</h2>
         <a href="dashboard.php">📊 Resumen</a>
         <a href="pedidos.php">🛎️ Pedidos</a>
+        <a href="reportes.php">📈 Reportes</a> 
         <a href="productos.php">🍔 Productos</a>
         <a href="categorias.php">📂 Categorías</a>
+        <a href="galeria.php">📸 Galería</a>
         <a href="resenas.php">⭐ Reseñas</a>
-        <a href="configuracion.php" class="active">⚙️ Configuración</a>
+        <a href="configuracion.php" cla="active">⚙️ Configuración</a>
         <a href="logout.php" class="salir">Cerrar Sesión</a>
     </nav>
 

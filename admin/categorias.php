@@ -58,6 +58,7 @@ $categorias = $pdo->query("SELECT * FROM categorias ORDER BY orden ASC")->fetchA
         <h2>Mi Restaurante</h2>
         <a href="dashboard.php">📊 Resumen</a>
         <a href="pedidos.php">🛎️ Pedidos</a>
+         <a href="reportes.php">📈 Reportes</a> 
         <a href="productos.php">🍔 Productos</a>
         <a href="categorias.php" class="active">📂 Categorías</a>
         <a href="galeria.php">📸 Galería</a>
