@@ -1,82 +1,83 @@
 <?php
-/* Archivo: admin/producto_form.php (Sirve para CREAR y EDITAR) */
-session_start();
-require '../config/db.php';
-require '../includes/funciones.php';
-verificar_admin();
+            /* Archivo: admin/producto_form.php (Sirve para CREAR y EDITAR) */
+            session_start();
+            require '../config/db.php';
+            require '../includes/funciones.php';
+            verificar_admin();
 
-// 1. INICIALIZAR VARIABLES VACÍAS (Para cuando es Nuevo)
-$producto = [
-    'id' => '',
-    'nombre' => '',
-    'descripcion' => '',
-    'precio' => '',
-    'categoria_id' => '',
-    'imagen' => '',
-    'activo' => 1,      // Por defecto activo
-    'destacado' => 0    // Por defecto no destacado
-];
-$titulo = "Nuevo Platillo";
+            // 1. INICIALIZAR VARIABLES VACÍAS (Para cuando es Nuevo)
+            $producto = [
+                'id' => '',
+                'nombre' => '',
+                'descripcion' => '',
+                'precio' => '',
+                'categoria_id' => '',
+                'imagen' => '',
+                'activo' => 1,      // Por defecto activo
+                'destacado' => 0    // Por defecto no destacado
+            ];
+            $titulo = "Nuevo Platillo";
 
-// 2. SI LLEGA UN ID EN LA URL, ES "MODO EDICIÓN"
-if (isset($_GET['id'])) {
-    $id = (int)$_GET['id'];
-    $stmt = $pdo->prepare("SELECT * FROM productos WHERE id = ?");
-    $stmt->execute([$id]);
-    $producto_encontrado = $stmt->fetch();
+            // 2. SI LLEGA UN ID EN LA URL, ES "MODO EDICIÓN"
+            if (isset($_GET['id'])) {
+                $id = (int)$_GET['id'];
+                $stmt = $pdo->prepare("SELECT * FROM productos WHERE id = ?");
+                $stmt->execute([$id]);
+                $producto_encontrado = $stmt->fetch();
 
-    if ($producto_encontrado) {
-        $producto = $producto_encontrado;
-        $titulo = "Editar: " . htmlspecialchars($producto['nombre']);
-    }
-}
+                if ($producto_encontrado) {
+                    $producto = $producto_encontrado;
+                    $titulo = "Editar: " . htmlspecialchars($producto['nombre']);
+                }
+            }
+                    
+            // 3. PROCESAR EL FORMULARIO CUANDO LE DAS A GUARDAR
+            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                $id = $_POST['id']; // Si tiene ID es update, si no es insert
+                $nombre = limpiar_str($_POST['nombre']);
+                $desc = limpiar_str($_POST['descripcion']);
+                $stock = (int)$_POST['stock'];
+                $precio = (float)$_POST['precio'];
+                $cat_id = (int)$_POST['categoria_id'];
+                
+                // Checkboxes (Si no están marcados, no envían nada, así que asumimos 0)
+                $activo = isset($_POST['activo']) ? 1 : 0;
+                $destacado = isset($_POST['destacado']) ? 1 : 0;
 
-// 3. PROCESAR EL FORMULARIO CUANDO LE DAS A GUARDAR
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $id = $_POST['id']; // Si tiene ID es update, si no es insert
-    $nombre = limpiar_str($_POST['nombre']);
-    $desc = limpiar_str($_POST['descripcion']);
-    $precio = (float)$_POST['precio'];
-    $cat_id = (int)$_POST['categoria_id'];
-    
-    // Checkboxes (Si no están marcados, no envían nada, así que asumimos 0)
-    $activo = isset($_POST['activo']) ? 1 : 0;
-    $destacado = isset($_POST['destacado']) ? 1 : 0;
+                // MANEJO DE LA FOTO
+                $nombre_imagen = $producto['imagen']; // Mantenemos la vieja por defecto
+                
+                // Si subieron una nueva...
+                if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+                    $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+                    $nombre_imagen = time() . "_" . rand(100,999) . "." . $ext; // Nombre único
+                    move_uploaded_file($_FILES['foto']['tmp_name'], "../uploads/productos/" . $nombre_imagen);
+                }
 
-    // MANEJO DE LA FOTO
-    $nombre_imagen = $producto['imagen']; // Mantenemos la vieja por defecto
-    
-    // Si subieron una nueva...
-    if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
-        $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-        $nombre_imagen = time() . "_" . rand(100,999) . "." . $ext; // Nombre único
-        move_uploaded_file($_FILES['foto']['tmp_name'], "../uploads/productos/" . $nombre_imagen);
-    }
+                try {
+                    if ($id) {
+                        // --- ACTUALIZAR EXISTENTE ---
+                        $sql = "UPDATE productos SET nombre=?, descripcion=?, precio=?, stock=?, categoria_id=?, imagen=?, activo=?, destacado=? WHERE id=?";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute([$nombre, $desc, $precio, $stock, $cat_id, $nombre_imagen, $activo, $destacado, $id]);
+                    } else {
+                        // --- CREAR NUEVO ---
+                        $sql = "INSERT INTO productos (nombre, descripcion, precio, categoria_id, imagen, activo, destacado) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute([$nombre, $desc, $precio, $cat_id, $nombre_imagen, $activo, $destacado]);
+                    }
+                    
+                    // Volver al listado
+                    header("Location: productos.php");
+                    exit();
 
-    try {
-        if ($id) {
-            // --- ACTUALIZAR EXISTENTE ---
-            $sql = "UPDATE productos SET nombre=?, descripcion=?, precio=?, categoria_id=?, imagen=?, activo=?, destacado=? WHERE id=?";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$nombre, $desc, $precio, $cat_id, $nombre_imagen, $activo, $destacado, $id]);
-        } else {
-            // --- CREAR NUEVO ---
-            $sql = "INSERT INTO productos (nombre, descripcion, precio, categoria_id, imagen, activo, destacado) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$nombre, $desc, $precio, $cat_id, $nombre_imagen, $activo, $destacado]);
-        }
-        
-        // Volver al listado
-        header("Location: productos.php");
-        exit();
+                } catch (PDOException $e) {
+                    echo "Error: " . $e->getMessage();
+                }
+            }
 
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
-    }
-}
-
-// 4. TRAER CATEGORÍAS (Para llenar el select)
-$categorias = $pdo->query("SELECT * FROM categorias ORDER BY orden ASC")->fetchAll();
+            // 4. TRAER CATEGORÍAS (Para llenar el select)
+            $categorias = $pdo->query("SELECT * FROM categorias ORDER BY orden ASC")->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -115,7 +116,15 @@ $categorias = $pdo->query("SELECT * FROM categorias ORDER BY orden ASC")->fetchA
                     <input type="text" name="nombre" class="form-control" 
                            value="<?php echo htmlspecialchars($producto['nombre']); ?>" required>
                 </div>
-
+                     <div class="form-group">
+                        <label for="stock" class="form-label">Stock / Cantidad:</label>
+                        <input type="number" 
+                            class="form-control" 
+                            id="stock" 
+                            name="stock" 
+                            value="<?php echo $producto['stock']; ?>" 
+                            required>
+                    </div>
                 <div class="form-group">
                     <label class="form-label">Descripción:</label>
                     <textarea name="descripcion" class="form-control" rows="3"><?php echo htmlspecialchars($producto['descripcion']); ?></textarea>

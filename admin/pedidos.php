@@ -20,8 +20,36 @@ if (isset($_POST['accion']) && $_POST['accion'] == 'actualizar') {
     exit;
 }
 
-// 2. OBTENER PEDIDOS
-$stmt = $pdo->query("SELECT * FROM pedidos ORDER BY id DESC");
+// CONSTRUCCIÓN DE FILTROS INTELIGENTE
+$where = [];
+$params = [];
+
+// 1. Filtro base (siempre quieres ver esto)
+$sql = "SELECT * FROM pedidos";
+
+// 2. ¿Puso fecha?
+if (!empty($_GET['fecha'])) {
+    $where[] = "DATE(fecha) = ?";
+    $params[] = $_GET['fecha'];
+}
+
+// 3. ¿Puso estado?
+if (!empty($_GET['estado'])) {
+    $where[] = "estado = ?";
+    $params[] = $_GET['estado'];
+}
+
+// 4. Si hay filtros, los agregamos a la consulta
+if (count($where) > 0) {
+    $sql .= " WHERE " . implode(" AND ", $where);
+}
+
+// 5. Ordenamos siempre por el más nuevo
+$sql .= " ORDER BY id DESC";
+
+// 6. Ejecutamos la consulta preparada
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -74,12 +102,12 @@ $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .btn-save { width: 100%; background: #27ae60; color: white; border: none; padding: 12px; border-radius: 5px; font-size: 1rem; cursor: pointer; font-weight: bold; margin-top: 10px;}
         .btn-close { background: transparent; border: none; color: #777; cursor: pointer; float: right; font-size: 1.5rem; margin-top: -15px; margin-right: -10px;}
         .nota-corta {
-    max-width: 200px;         /* Ancho máximo de la columna */
-    white-space: nowrap;      /* No permite saltos de línea */
-    overflow: hidden;         /* Oculta lo que sobre */
-    text-overflow: ellipsis;  /* Pone "..." al final */
-    display: inline-block;
-    vertical-align: middle;
+                max-width: 200px;         /* Ancho máximo de la columna */
+                white-space: nowrap;      /* No permite saltos de línea */
+                overflow: hidden;         /* Oculta lo que sobre */
+                text-overflow: ellipsis;  /* Pone "..." al final */
+                display: inline-block;
+                vertical-align: middle;
 }
     </style>
 </head>
@@ -109,6 +137,41 @@ $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         <?php else: ?>
             <div style="overflow-x: auto;">
+                <div class="card" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa;">
+    <form method="GET" style="display: flex; gap: 15px; align-items: end; flex-wrap: wrap;">
+        
+        <div>
+            <label style="font-weight: bold; font-size: 0.9rem;">📅 Fecha:</label><br>
+            <input type="date" name="fecha" value="<?php echo $_GET['fecha'] ?? ''; ?>" 
+                   style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+
+        <div>
+            <label style="font-weight: bold; font-size: 0.9rem;">🚦 Estado:</label><br>
+            <select name="estado" style="padding: 9px; border: 1px solid #ddd; border-radius: 5px; min-width: 150px;">
+                <option value="">-- Todos --</option>
+                <option value="pendiente" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'pendiente') ? 'selected' : ''; ?>>Pendiente 🟡</option>
+                <option value="preparando" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'preparando') ? 'selected' : ''; ?>>Preparando 🍳</option>
+                <option value="en_camino" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'en_camino') ? 'selected' : ''; ?>>En Camino 🛵</option>
+                <option value="entregado" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'entregado') ? 'selected' : ''; ?>>Entregado ✅</option>
+                <option value="cancelado" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'cancelado') ? 'selected' : ''; ?>>Cancelado ❌</option>
+            </select>
+        </div>
+
+        <div>
+            <button type="submit" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                🔍 Filtrar
+            </button>
+            
+            <?php if(isset($_GET['fecha']) || isset($_GET['estado'])): ?>
+                <a href="pedidos.php" style="margin-left: 10px; color: #e74c3c; text-decoration: none; font-weight: bold;">
+                    ✖ Limpiar
+                </a>
+            <?php endif; ?>
+        </div>
+
+    </form>
+</div>
                 <table>
                     <thead>
                         <tr>
@@ -123,6 +186,7 @@ $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <tbody>
                         <?php foreach($pedidos as $p): ?>
                         <?php 
+                        
                             // Aseguramos que no esté vacío para el color CSS
                             $estado_css = !empty($p['estado']) ? strtolower($p['estado']) : 'vacio'; 
                             $estado_txt = !empty($p['estado']) ? ucfirst($p['estado']) : 'Sin Estado';
@@ -134,27 +198,32 @@ $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <small style="color:#777;">📅 <?php echo date('d/m H:i', strtotime($p['fecha'])); ?></small>
                             </td>
                             <td>$<?php echo number_format($p['total'], 2); ?></td>
+                                    
+                                    <td class="text-center">
+                                                <span class="badge st-<?php echo $estado_css; ?>" 
+                                                    style="<?php echo ($estado_css == 'preparando') ? 'background-color: #e67e22 !important; color: white !important;' : ''; ?>">
+                                                    <?php echo $estado_txt; ?>
+                                                </span>
+                                            </td>
                             
-                            <td><span class="badge st-<?php echo $estado_css; ?>"><?php echo $estado_txt; ?></span></td>
-                            
-                            <td style="font-style: italic; color: #555;">
-                                <?php echo !empty($p['mensaje_admin']) ? '💬 "'.htmlspecialchars($p['mensaje_admin']).'"' : '-'; ?>
-                            </td>
+                                            <td style="font-style: italic; color: #555;">
+                                                <?php echo !empty($p['mensaje_admin']) ? '💬 "'.htmlspecialchars($p['mensaje_admin']).'"' : '-'; ?>
+                                            </td>
 
                                 <td>
-                                    <button class="btn-admin" 
-                                            data-id="<?php echo $p['id']; ?>"
-                                            data-estado="<?php echo $p['estado']; ?>"
-                                            data-mensaje="<?php echo htmlspecialchars($p['mensaje_admin'] ?? ''); ?>"
-                                            onclick="abrirGestorDesdeData(this)">
-                                        ⚙️ Gestionar
-                                    </button>
-                                 <a href="ticket.php?id=<?php echo $p['id']; ?>" 
-                                    target="_blank" 
-                                    class="btn-admin" 
-                                    style="background: #7f8c8d; text-decoration: none; justify-content: center; width: 50px; margin-top:5px;">
-                                    🖨️
-                                 </a>
+                                        <button class="btn-admin" 
+                                                data-id="<?php echo $p['id']; ?>"
+                                                data-estado="<?php echo $p['estado']; ?>"
+                                                data-mensaje="<?php echo htmlspecialchars($p['mensaje_admin'] ?? ''); ?>"
+                                                onclick="abrirGestorDesdeData(this)">
+                                            ⚙️ Gestionar
+                                        </button>
+                                            <a href="ticket.php?id=<?php echo $p['id']; ?>" 
+                                                target="_blank" 
+                                                class="btn-admin" 
+                                                style="background: #7f8c8d; text-decoration: none; justify-content: center; width: 50px; margin-top:5px;">
+                                                🖨️
+                                            </a>
                                 </td>
 
                         </tr>
@@ -179,10 +248,10 @@ $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="form-group">
                 <label>📍 Estado del Pedido:</label>
                 <select name="estado" id="modalEstado" class="form-control">
-                    <option value="pendiente">🟡 Pendiente (Recibido)</option>
-                    <option value="cocinando">🔥 Cocinando (En preparación)</option>
-                    <option value="enviado">🛵 Enviado (En camino)</option>
-                    <option value="completado">✅ Completado (Entregado)</option>
+                   <option value="pendiente">🟡 Pendiente</option>
+                    <option value="preparando">🍳 Preparando</option> 
+                    <option value="en_camino">🛵 En Camino</option>   
+                    <option value="entregado">✅ Entregado</option>
                     <option value="cancelado">❌ Cancelado</option>
                 </select>
             </div>

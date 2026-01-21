@@ -75,6 +75,7 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th>Nombre</th>
                     <th>Categoría</th>
                     <th>Precio</th>
+                    <th>Stock 📦</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -97,6 +98,11 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </td>
                     <td><?php echo htmlspecialchars($prod['nombre_categoria'] ?? 'Sin categoría'); ?></td>
                     <td>$<?php echo number_format($prod['precio'], 2); ?></td>
+                    <td>
+                      <span class="badge" style="<?php echo ($prod['stock'] < 5) ? 'background: red;' : 'background: green;'; ?>">
+                            <?php echo $prod['stock']; ?>
+                        </span>
+                    </td>
                     <td>
                         <?php if($prod['activo']): ?>
                             <span class="badge badge-verde">Activo</span>
