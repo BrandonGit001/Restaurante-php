@@ -67,7 +67,9 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <h1>Mis Platillos</h1>
             <a href="producto_nuevo.php" class="btn btn-verde">+ Nuevo Platillo</a>
         </div>
-
+<div class="alert alert-info text-center">
+    <i class="fas fa-sync fa-spin"></i> Monitor en vivo: Se actualiza cada 30 segundos.
+</div>
         <table class="tabla-datos">
             <thead>
                 <tr>
@@ -138,5 +140,16 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </main>
 </div>
 
+<script>
+    // Configuración: Tiempo en segundos para recargar
+    const segundos = 30; 
+
+    // La magia: Cuenta regresiva invisible
+    setInterval(function() {
+        location.reload(); // Esto es como presionar F5 automáticamente
+    }, segundos * 1000);   // Multiplicamos por 1000 porque JS cuenta en milisegundos
+
+    console.log("El monitor se actualizará en " + segundos + " segundos.");
+</script>
 </body>
 </html>

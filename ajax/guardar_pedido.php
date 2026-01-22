@@ -28,7 +28,15 @@ $lista_productos = "";
 
 // 3. Formatear lista de productos
 foreach ($data['productos'] as $prod) {
-    $lista_productos .= $prod['cantidad'] . "x " . $prod['nombre'] . "\n";
+    // A. Esto ya lo tenías (crea el texto para el recibo)
+    $lista_productos .= $prod['cantidad'] . " x " . $prod['nombre'] . "\n";
+
+    // B. ESTO ES LO NUEVO: ¡La resta mágica! 📉
+    $stmt_stock = $pdo->prepare("UPDATE productos SET stock = stock - :cant WHERE id = :id");
+    $stmt_stock->execute([
+        ':cant' => $prod['cantidad'],
+        ':id'   => $prod['id']
+    ]);
 }
 
 try {
