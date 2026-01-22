@@ -313,3 +313,12 @@ body {
     padding-top: 90px;      /* Empujamos el contenido hacia abajo */
     margin: 0;              /* Quitamos márgenes feos del navegador */
 }
+
+/* Esto fuerza a que todas las imágenes midan lo mismo de alto y se recorten bien */
+.card-img-top, .card img {
+    height: 200px; /* Puedes ajustar este número */
+    width: 100%;
+    object-fit: cover; /* La magia: recorta la imagen sin estirarla */
+    border-top-left-radius: 15px; /* Opcional: bordes redondos arriba */
+    border-top-right-radius: 15px;
+}

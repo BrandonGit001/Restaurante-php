@@ -98,6 +98,11 @@ $usuario_nombre = $_SESSION['user_nombre'] ?? 'Invitado';
             position: relative;
             z-index: 2; /* Va encima del banner visualmente */
         }
+        /* ESTO ES LO QUE FALTABA: */
+    /* Fuerza al panel a mostrarse cuando JS le pone la clase "activo" */
+        #modal-carrito.activo {
+        display: flex !important;
+    }
     </style>
 </head>
 
@@ -271,15 +276,27 @@ $usuario_nombre = $_SESSION['user_nombre'] ?? 'Invitado';
         <p>&copy; 2026 <strong><?php echo htmlspecialchars($config['nombre_negocio']); ?></strong></p>
     </footer>
 
-    <div class="modal-overlay" id="modal-carrito">
-        <div class="modal-content">
-            <button class="close-btn" onclick="toggleCarrito()">X</button>
-            <h2>Tu Pedido</h2>
-            <div id="carrito-items"></div>
-            <div class="total-row"><span>Total:</span><span id="carrito-total">$0.00</span></div>
-            <button class="btn-pedir" onclick="enviarPedido()">Confirmar Pedido</button>
-        </div>
+    <div id="modal-carrito" style="display:none; position:fixed; top:0; right:0; width:100%; max-width:400px; height:100%; background:white; z-index:2000; box-shadow:-5px 0 15px rgba(0,0,0,0.1); flex-direction:column;">
+    
+    <div style="padding:20px; background:#333; color:white; display:flex; justify-content:space-between;">
+        <h2>Tu Pedido 🛒</h2>
+        <button onclick="toggleCarrito()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
     </div>
+
+    <div id="carrito-items" style="flex:1; overflow-y:auto; padding:20px;">
+        <p style="text-align:center; color:#777;">Tu carrito está vacío.</p>
+    </div>
+
+    <div style="padding:20px; border-top:1px solid #eee;">
+        <div style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:bold; margin-bottom:15px;">
+            <span>Total:</span>
+            <span id="carrito-total">$0.00</span>
+        </div>
+        <button onclick="enviarPedido()" style="width:100%; background:#f1c40f; color:#333; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:1.1rem; cursor:pointer;">
+            Confirmar Pedido ✅
+        </button>
+    </div>
+</div>
 
     <script src="assets/js/app.js"></script>
 </body>

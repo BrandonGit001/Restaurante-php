@@ -1,5 +1,4 @@
 <?php
-/* menu.php - CORREGIDO CON TUS RUTAS REALES */
 session_start();
 require 'config/db.php';
 // require 'includes/funciones.php'; // Si da error, lo dejamos comentado
@@ -53,8 +52,8 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
-
-    <script src="js/app.js" defer></script>
+  
+   <script src="assets/js/app.js" defer></script>
     <style>
         /* AJUSTES EXTRA PARA LAS TARJETAS */
         .card img { 
@@ -65,6 +64,9 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             color: #777; margin-bottom: 10px; font-size: 0.9rem;
         }
         /* Para ocultar el header fijo del index si estorba, o ajustarlo */
+        #modal-carrito.activo {
+                display: flex !important; 
+            }
         body { padding-top: 80px; } 
     </style>
 </head>
@@ -93,7 +95,7 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <a href="javascript:void(0)" onclick="toggleCarrito()" style="text-decoration:none; position:relative;">
                 <span style="font-size:1.5rem;">🛒</span>
-                <span id="carrito-count" style="position:absolute; top:-5px; right:-5px; background:red; color:white; font-size:0.7rem; padding:2px 6px; border-radius:50%;">0</span>
+                <span id="carrito-count" class="badge bg-danger rounded-pill">0</span>
             </a>
         </div>
     </header>
@@ -139,13 +141,19 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 $<?php echo number_format($p['precio'], 2); ?>
                             </span>
                             
-                            <button onclick="agregarAlCarrito(
-                                <?php echo $p['id']; ?>, 
-                                '<?php echo htmlspecialchars($p['nombre']); ?>', 
-                                <?php echo $p['precio']; ?>
-                            )" style="background: #2ecc71; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold;">
-                                Agregar +
-                            </button>
+                           <?php if($p['stock'] > 0): ?>
+    
+                              <button class="btn-add" onclick="agregarAlCarrito(<?php echo $p['id']; ?>, '<?php echo htmlspecialchars($p['nombre']); ?>', <?php echo $p['precio']; ?>)">
+                                    Agregar
+                                </button>
+
+                            <?php else: ?>
+
+                                <button class="btn-add" disabled style="cursor: not-allowed;">
+                                    <i class="fas fa-times-circle"></i> Agotado
+                                </button>
+
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -153,12 +161,12 @@ $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-    <div id="carrito-modal" style="display:none; position:fixed; top:0; right:0; width:100%; max-width:400px; height:100%; background:white; z-index:2000; box-shadow:-5px 0 15px rgba(0,0,0,0.1); flex-direction:column;">
+    <div id="modal-carrito" style="display:none; position:fixed; top:0; right:0; width:100%; max-width:400px; height:100%; background:white; z-index:2000; box-shadow:-5px 0 15px rgba(0,0,0,0.1); flex-direction:column;">
         <div style="padding:20px; background:#333; color:white; display:flex; justify-content:space-between;">
             <h2>Tu Pedido 🛒</h2>
             <button onclick="toggleCarrito()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
         </div>
-        <div id="lista-carrito" style="flex:1; overflow-y:auto; padding:20px;">
+        <div id="carrito-items" style="flex:1; overflow-y:auto; padding:20px;">
             <p style="text-align:center; color:#777;">Tu carrito está vacío.</p>
         </div>
         <div style="padding:20px; border-top:1px solid #eee;">
